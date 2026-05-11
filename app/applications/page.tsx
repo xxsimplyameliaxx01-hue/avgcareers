@@ -7,7 +7,7 @@ import { Footer } from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { getApplications, getStatusLabel, getStatusColor, Application } from '@/lib/applications-store'
+import { getApplications, clearApplications, getStatusLabel, getStatusColor, Application } from '@/lib/applications-store'
 import { FileText, ArrowRight, Calendar, Building, Briefcase, Trash2 } from 'lucide-react'
 
 export default function ApplicationsPage() {
@@ -29,8 +29,7 @@ export default function ApplicationsPage() {
   }
 
   const handleClearAll = () => {
-    // Clear from store — adjust this call to match your clearApplications export
-    localStorage.removeItem('applications')
+    clearApplications()
     setApplications([])
     setShowConfirm(false)
   }
