@@ -1,15 +1,11 @@
 'use client'
-
 import { Application } from './jobs-data'
-
 const STORAGE_KEY = 'avio-applications'
-
 export function getApplications(): Application[] {
   if (typeof window === 'undefined') return []
   const stored = localStorage.getItem(STORAGE_KEY)
   return stored ? JSON.parse(stored) : []
 }
-
 export function addApplication(application: Omit<Application, 'id' | 'appliedDate'>): Application {
   const applications = getApplications()
   const newApplication: Application = {
@@ -21,17 +17,24 @@ export function addApplication(application: Omit<Application, 'id' | 'appliedDat
   localStorage.setItem(STORAGE_KEY, JSON.stringify(applications))
   return newApplication
 }
-
+export function removeApplication(id: string): void {
+  const applications = getApplications()
+  const updated = applications.filter(app => app.id !== id)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+}
+export function removeApplicationByJobId(jobId: string): void {
+  const applications = getApplications()
+  const updated = applications.filter(app => app.jobId !== jobId)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+}
 export function hasAppliedToJob(jobId: string): boolean {
   const applications = getApplications()
   return applications.some(app => app.jobId === jobId)
 }
-
 export function getApplicationByJobId(jobId: string): Application | undefined {
   const applications = getApplications()
   return applications.find(app => app.jobId === jobId)
 }
-
 export function getStatusLabel(status: Application['status']): string {
   const labels: Record<Application['status'], string> = {
     pending: 'Application Submitted',
@@ -42,7 +45,6 @@ export function getStatusLabel(status: Application['status']): string {
   }
   return labels[status]
 }
-
 export function getStatusColor(status: Application['status']): string {
   const colors: Record<Application['status'], string> = {
     pending: 'bg-amber-100 text-amber-800',
@@ -53,7 +55,6 @@ export function getStatusColor(status: Application['status']): string {
   }
   return colors[status]
 }
-
 export function updateApplicationStatusByJob(jobTitle: string, newStatus: Application['status']): boolean {
   const applications = getApplications()
   const index = applications.findIndex(app => app.jobTitle === jobTitle)
