@@ -173,7 +173,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    avio group is a leading technology company focused on building innovative solutions that transform industries. With over 500 employees across 25+ countries, we&apos;re committed to creating a diverse and inclusive workplace.
+                    avio group is a leading technology company focused on building innovative solutions that transform industries. With over 40 employees across 5 countries, we&apos;re committed to creating a diverse and inclusive workplace.
                   </p>
                 </CardContent>
               </Card>
