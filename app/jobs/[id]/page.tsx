@@ -139,6 +139,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                   <CardTitle className="text-lg">Apply for this position</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {hasApplied ? (
+                    <div>
                       <p className="text-sm text-muted-foreground">
                         You have already applied for this position. Track your application status on the{' '}
                         <Link href="/applications" className="text-primary hover:underline">
