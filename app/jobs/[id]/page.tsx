@@ -139,13 +139,6 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                   <CardTitle className="text-lg">Apply for this position</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {hasApplied ? (
-                    <div className="space-y-4">
-                      <div className={`rounded-lg px-4 py-3 ${getStatusColor(getApplicationByJobId(job.id)?.status || 'pending')}`}>
-                        <p className="text-sm font-medium">
-                          {applicationStatus || 'Application Submitted'}
-                        </p>
-                      </div>
                       <p className="text-sm text-muted-foreground">
                         You have already applied for this position. Track your application status on the{' '}
                         <Link href="/applications" className="text-primary hover:underline">
