@@ -10,8 +10,8 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { getJobById, jobs, Job } from '@/lib/jobs-data'
-import { hasAppliedToJob, getApplicationByJobId, getStatusLabel, getStatusColor } from '@/lib/applications-store'
-import { ArrowLeft, MapPin, Briefcase, Clock, DollarSign, Building, CheckCircle } from 'lucide-react'
+import { hasAppliedToJob, getApplicationByJobId, getStatusLabel, getStatusColor, removeApplicationByJobId } from '@/lib/applications-store'
+import { ArrowLeft, MapPin, Briefcase, Clock, DollarSign, Building, CheckCircle, Trash2 } from 'lucide-react'
 import { ApplicationDialog } from '@/components/application-dialog'
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,6 +43,12 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
   const handleApplicationSuccess = () => {
     setHasApplied(true)
     setApplicationStatus('Application Submitted')
+  }
+
+  const handleDeleteApplication = () => {
+    removeApplicationByJobId(job.id)
+    setHasApplied(false)
+    setApplicationStatus(null)
   }
 
   return (
@@ -140,7 +146,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {hasApplied ? (
-                    <div>
+                    <div className="space-y-4">
                       <p className="text-sm text-muted-foreground">
                         You have already applied for this position. Track your application status on the{' '}
                         <Link href="/applications" className="text-primary hover:underline">
@@ -148,6 +154,15 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                         </Link>{' '}
                         page.
                       </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30 hover:border-destructive/50"
+                        onClick={handleDeleteApplication}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Withdraw Application
+                      </Button>
                     </div>
                   ) : (
                     <>
