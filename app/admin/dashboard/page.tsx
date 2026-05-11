@@ -25,24 +25,24 @@ import {
 } from '@/components/ui/select'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { 
-  getCurrentUser, 
-  clearCurrentUser, 
-  isAdmin, 
+import {
+  getCurrentUser,
+  clearCurrentUser,
+  isAdmin,
   isSuperAdmin,
-  getSubmittedApplications,
+  getApplications,
   updateApplicationStatus,
-  type SubmittedApplication,
-  type ApplicationStatus
-} from '@/lib/admin-store'
+  type Application,
+  type ApplicationStatus,
+} from '@/lib/unified-store'
 import { toast } from 'sonner'
 import { LogOut, Users, Clock, CheckCircle, XCircle, Eye, UserCog } from 'lucide-react'
 
 export default function AdminDashboard() {
   const router = useRouter()
   const [currentUser, setCurrentUserState] = useState<string | null>(null)
-  const [applications, setApplications] = useState<SubmittedApplication[]>([])
-  const [selectedApp, setSelectedApp] = useState<SubmittedApplication | null>(null)
+  const [applications, setApplications] = useState<Application[]>([])
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null)
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [reviewNote, setReviewNote] = useState('')
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
       return
     }
     setCurrentUserState(user)
-    setApplications(getSubmittedApplications())
+    setApplications(getApplications())
     setIsCheckingAuth(false)
   }, [router])
 
@@ -69,21 +69,17 @@ export default function AdminDashboard() {
 
   const handleDecision = async (decision: 'accepted' | 'denied') => {
     if (!selectedApp || !currentUser) return
-    
     setIsSubmitting(true)
-    
+
     try {
-      // Update local storage
       const updated = updateApplicationStatus(
         selectedApp.id,
         decision,
         currentUser,
         reviewNote || undefined
       )
-      
-      if (!updated) {
-        throw new Error('Failed to update application')
-      }
+
+      if (!updated) throw new Error('Failed to update application')
 
       // Send Discord notification
       await fetch('/api/notify-decision', {
@@ -99,13 +95,13 @@ export default function AdminDashboard() {
         }),
       })
 
-      setApplications(getSubmittedApplications())
+      setApplications(getApplications())
       setIsReviewDialogOpen(false)
       setSelectedApp(null)
       setReviewNote('')
-      
+
       toast.success(decision === 'accepted' ? 'Application Accepted' : 'Application Denied', {
-        description: `Decision has been recorded and applicant notified.`,
+        description: 'Decision has been recorded and applicant notified.',
       })
     } catch (error) {
       console.error('Error processing decision:', error)
@@ -153,6 +149,7 @@ export default function AdminDashboard() {
       <Header />
       <main className="flex-1 px-4 py-8 md:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
+
           {/* Header */}
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -221,6 +218,7 @@ export default function AdminDashboard() {
               <SelectContent>
                 <SelectItem value="all">All Applications</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="under_review">Under Review</SelectItem>
                 <SelectItem value="accepted">Accepted</SelectItem>
                 <SelectItem value="denied">Denied</SelectItem>
               </SelectContent>
@@ -234,18 +232,14 @@ export default function AdminDashboard() {
                 <Users className="h-5 w-5" />
                 Applications
               </CardTitle>
-              <CardDescription>
-                Review and manage job applications
-              </CardDescription>
+              <CardDescription>Review and manage job applications</CardDescription>
             </CardHeader>
             <CardContent>
               {filteredApplications.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground">
-                  No applications found
-                </div>
+                <div className="py-12 text-center text-muted-foreground">No applications found</div>
               ) : (
                 <div className="space-y-4">
-                  {filteredApplications.map((app) => (
+                  {filteredApplications.map(app => (
                     <div
                       key={app.id}
                       className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
@@ -255,9 +249,7 @@ export default function AdminDashboard() {
                           <span className="font-semibold">{app.robloxUsername}</span>
                           {getStatusBadge(app.status)}
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          Discord: {app.discordUsername}
-                        </p>
+                        <p className="text-sm text-muted-foreground">Discord: {app.discordUsername}</p>
                         <p className="text-sm text-muted-foreground">
                           Applied for: <span className="text-foreground">{app.jobTitle}</span>
                         </p>
@@ -275,10 +267,7 @@ export default function AdminDashboard() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            setSelectedApp(app)
-                            setIsViewDialogOpen(true)
-                          }}
+                          onClick={() => { setSelectedApp(app); setIsViewDialogOpen(true) }}
                         >
                           <Eye className="mr-2 h-4 w-4" />
                           View
@@ -286,11 +275,7 @@ export default function AdminDashboard() {
                         {app.status === 'pending' && (
                           <Button
                             size="sm"
-                            onClick={() => {
-                              setSelectedApp(app)
-                              setReviewNote('')
-                              setIsReviewDialogOpen(true)
-                            }}
+                            onClick={() => { setSelectedApp(app); setReviewNote(''); setIsReviewDialogOpen(true) }}
                           >
                             Review
                           </Button>
@@ -312,7 +297,7 @@ export default function AdminDashboard() {
           <DialogHeader>
             <DialogTitle>Application Details</DialogTitle>
             <DialogDescription>
-              {selectedApp?.jobTitle} - {selectedApp?.robloxUsername}
+              {selectedApp?.jobTitle} — {selectedApp?.robloxUsername}
             </DialogDescription>
           </DialogHeader>
           {selectedApp && (
@@ -343,27 +328,19 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <Label className="text-muted-foreground">Why This Role?</Label>
-                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">
-                  {selectedApp.whyRole}
-                </p>
+                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">{selectedApp.whyRole}</p>
               </div>
               <div>
                 <Label className="text-muted-foreground">Why avio group?</Label>
-                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">
-                  {selectedApp.whyAvioGroup}
-                </p>
+                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">{selectedApp.whyAvioGroup}</p>
               </div>
               <div>
                 <Label className="text-muted-foreground">What Makes You a Good Fit?</Label>
-                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">
-                  {selectedApp.whatMakesYouFit}
-                </p>
+                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">{selectedApp.whatMakesYouFit}</p>
               </div>
               <div>
                 <Label className="text-muted-foreground">Difficult Situation Example</Label>
-                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">
-                  {selectedApp.difficultSituation}
-                </p>
+                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">{selectedApp.difficultSituation}</p>
               </div>
               {selectedApp.reviewedBy && (
                 <div className="rounded-md border p-4">
@@ -411,7 +388,7 @@ export default function AdminDashboard() {
                 id="reviewNote"
                 placeholder="Add a note about your decision..."
                 value={reviewNote}
-                onChange={(e) => setReviewNote(e.target.value)}
+                onChange={e => setReviewNote(e.target.value)}
               />
             </div>
           </div>
