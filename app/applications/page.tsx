@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getApplications, getStatusLabel, getStatusColor, Application } from '@/lib/applications-store'
-import { FileText, ArrowRight, Calendar, Building, Briefcase } from 'lucide-react'
+import { FileText, ArrowRight, Calendar, Building, Briefcase, Trash2 } from 'lucide-react'
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   useEffect(() => {
     setApplications(getApplications())
@@ -27,6 +28,13 @@ export default function ApplicationsPage() {
     })
   }
 
+  const handleClearAll = () => {
+    // Clear from store — adjust this call to match your clearApplications export
+    localStorage.removeItem('applications')
+    setApplications([])
+    setShowConfirm(false)
+  }
+
   const pendingCount = applications.filter(app => app.status === 'pending').length
   const reviewingCount = applications.filter(app => app.status === 'reviewing').length
   const interviewCount = applications.filter(app => app.status === 'interview').length
@@ -39,12 +47,50 @@ export default function ApplicationsPage() {
         {/* Page Header */}
         <section className="border-b border-border bg-secondary/30 py-12 sm:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              My Applications
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl">
-              Track the status of your job applications and stay updated on your career journey.
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                  My Applications
+                </h1>
+                <p className="mt-4 text-lg text-muted-foreground max-w-2xl">
+                  Track the status of your job applications and stay updated on your career journey.
+                </p>
+              </div>
+
+              {applications.length > 0 && (
+                <div className="flex items-center gap-3 shrink-0">
+                  {showConfirm ? (
+                    <>
+                      <span className="text-sm text-muted-foreground">Are you sure?</span>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleClearAll}
+                      >
+                        Yes, clear all
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowConfirm(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowConfirm(true)}
+                      className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Clear All
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
