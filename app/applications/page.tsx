@@ -7,8 +7,8 @@ import { Footer } from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { getApplications, getStatusLabel, getStatusColor, Application } from '@/lib/applications-store'
-import { FileText, ArrowRight, Calendar, Building, Briefcase } from 'lucide-react'
+import { getApplications, getStatusLabel, getStatusColor, removeApplication, Application } from '@/lib/applications-store'
+import { FileText, ArrowRight, Calendar, Building, Briefcase, Trash2 } from 'lucide-react'
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([])
@@ -25,6 +25,11 @@ export default function ApplicationsPage() {
       month: 'long',
       day: 'numeric',
     })
+  }
+
+  const handleDelete = (id: string) => {
+    removeApplication(id)
+    setApplications(getApplications())
   }
 
   const pendingCount = applications.filter(app => app.status === 'pending').length
@@ -104,12 +109,23 @@ export default function ApplicationsPage() {
                               </span>
                             </div>
                           </div>
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={`/jobs/${application.jobId}`}>
-                              View Position
-                              <ArrowRight className="ml-2 h-4 w-4" />
-                            </Link>
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={`/jobs/${application.jobId}`}>
+                                View Position
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30 hover:border-destructive/50"
+                              onClick={() => handleDelete(application.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Delete application</span>
+                            </Button>
+                          </div>
                         </div>
                         
                         {/* Progress Timeline */}
