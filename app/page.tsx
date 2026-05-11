@@ -30,9 +30,9 @@ const values = [
 ]
 
 const stats = [
-  { value: '500+', label: 'Team Members' },
-  { value: '50+', label: 'Destinations' },
-  { value: '2M+', label: 'Passengers Annually' },
+  { value: '40+', label: 'Team Members' },
+  { value: '15+', label: 'Destinations' },
+  { value: '3k+', label: 'Passengers Annually' },
   { value: '98%', label: 'Employee Satisfaction' }
 ]
 
