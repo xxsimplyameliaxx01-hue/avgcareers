@@ -31,10 +31,10 @@ export const jobs: Job[] = [
     posted: '1 week ago',
     description: 'Join our cabin crew team and deliver exceptional service to passengers while ensuring their safety and comfort throughout their journey. As a Cabin Crew member, you will be the face of avio group, creating memorable experiences for travellers.',
     requirements: [
-      'Minimum age of 18 years',
-      'Height between 5\'2" and 6\'2" with weight in proportion',
+      'Minimum age of 13 years',
+      'Height between 5\'2" and 6\'2"',
       'Ability to swim at least 25 metres unaided',
-      'Fluent in English with excellent communication skills',
+      'Fluent in English with excellent communication skills to B2 CEFR Standards',
       'Valid passport with unrestricted travel rights',
       'Flexible availability including weekends and holidays',
       'Customer service experience preferred'
@@ -58,10 +58,8 @@ export const jobs: Job[] = [
     posted: '1 week ago',
     description: 'We are seeking qualified First Officers to join our flight deck team. As a First Officer, you will work alongside experienced Captains to ensure safe and efficient flight operations while building your aviation career with avio group.',
     requirements: [
-      'Hold a valid ATPL (frozen) or CPL with ATPL theory',
+      'Past experience preferred',
       'Current Class 1 Medical Certificate',
-      'Minimum 500 hours total flight time',
-      'Multi-Engine Instrument Rating',
       'Right to live and work in the UK',
       'Strong CRM and communication skills',
       'Type rating preferred but not essential'
@@ -85,8 +83,7 @@ export const jobs: Job[] = [
     posted: '1 week ago',
     description: 'Join our ground handling team as a Ramp Agent. You will play a vital role in ensuring aircraft are serviced efficiently and safely between flights, contributing to on-time departures and the overall passenger experience.',
     requirements: [
-      'Minimum age of 18 years',
-      'Valid UK driving licence',
+      'Minimum age of 13 years',
       'Ability to pass airside security clearance',
       'Physically fit to lift heavy items (up to 32kg)',
       'Flexible availability for shift work',
@@ -112,11 +109,11 @@ export const jobs: Job[] = [
     posted: '1 week ago',
     description: 'As a Terminal Agent, you will be the first point of contact for our passengers. You will provide exceptional customer service at check-in, boarding gates, and throughout the terminal to ensure a smooth and pleasant travel experience.',
     requirements: [
-      'Minimum age of 18 years',
+      'Minimum age of 13 years',
       'Excellent customer service and communication skills',
       'Ability to pass airside security clearance',
       'Proficient in computer systems and technology',
-      'Fluent in English; additional languages advantageous',
+      'Fluent in English to B2 CEFR Standard; additional languages advantageous ',
       'Flexible availability including early mornings and late evenings',
       'Previous customer-facing experience preferred'
     ],
