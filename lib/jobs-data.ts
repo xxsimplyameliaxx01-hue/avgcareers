@@ -134,7 +134,7 @@ export const jobs: Job[] = [
     type: 'Flexible',
     salary: 'Competitive',
     posted: '1 week ago',
-    description: 'As a Terminal Agent, you will responsible for avio groups online presence, including producing high quality content and press releases, you will be running the show and keeping us aligned with current industry trends and providing fresh ideas.',
+    description: 'As a Commerical & Media Agent, you will responsible for avio groups online presence, including producing high quality content and press releases, you will be running the show and keeping us aligned with current industry trends and providing fresh ideas.',
     requirements: [
       'Minimum age of 13 years',
       'Excellent customer service and communication skills',
