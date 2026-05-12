@@ -1,7 +1,7 @@
 'use client'
 
 // Super admin who can manage other admins
-export const SUPER_ADMIN = 'cxntiss1mo'
+export const SUPER_ADMIN = 'lolthefakeuser'
 
 // Keys for localStorage
 const ADMINS_KEY = 'avio-admins'
