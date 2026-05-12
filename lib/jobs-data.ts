@@ -125,6 +125,33 @@ export const jobs: Job[] = [
       'Provide information and resolve passenger queries',
       'Ensure compliance with airline and security procedures'
     ]
+  },
+  {
+    id: '5',
+    title: 'Commercial & Media Agent',
+    department: 'Head Office',
+    location: 'England',
+    type: 'Flexible',
+    salary: 'Competitive',
+    posted: '1 week ago',
+    description: 'As a Terminal Agent, you will responsible for avio groups online presence, including producing high quality content and press releases, you will be running the show and keeping us aligned with current industry trends and providing fresh ideas.',
+    requirements: [
+      'Minimum age of 13 years',
+      'Excellent customer service and communication skills',
+      'Ability to produce at least 1 video and 2 press releases per month',
+      'Proficient in computer systems and technology',
+      'Fluent in English to B2 CEFR Standard; additional languages advantageous ',
+      'Flexible availability including early mornings and late evenings',
+      'Previous customer-facing experience preferred'
+    ],
+    responsibilities: [
+      'Produce social media videos',
+      'Manage our online activity',
+      'Distributing press releases',
+      'Liasing with partner airlines',
+      'Provide information and resolve passenger queries',
+      'Keeping us prominent in an ever adapting digital world'
+    ]
   }
 ]
 
