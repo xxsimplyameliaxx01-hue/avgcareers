@@ -35,7 +35,7 @@ export default function AdminLoginPage() {
     const trimmedUsername = username.trim().toLowerCase()
 
     if (!trimmedUsername) {
-      toast.error('Please enter your credentials')
+      toast.error('Please enter your Discord username')
       setIsLoading(false)
       return
     }
