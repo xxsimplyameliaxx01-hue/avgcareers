@@ -153,33 +153,6 @@ export const jobs: Job[] = [
       'Keeping us prominent in an ever adapting digital world'
     ]
   },
-    {
-    id: '6',
-    title: 'Chief Pilot',
-    department: 'Head Office',
-    location: 'England',
-    type: 'Flexible',
-    salary: 'Competitive',
-    posted: '1 week ago',
-    description: 'As the Chief Pilot, you will be responsible for oversight of the entire Flight Deck department,. You will be tasked with the creation of documents and such as well as being expected to remain active and having good oversight',
-    requirements: [
-      'Minimum age of 13 years',
-      'Excellent customer service and communication skills',
-      'Ability to attend at least 2 flights per week',
-      'Proficient in computer systems and technology',
-      'Fluent in English to B2 CEFR Standard; additional languages advantageous ',
-      'Flexible availability including early mornings and late evenings',
-      'Previous HOD experience preferred'
-    ],
-    responsibilities: [
-      'Oversee the entire Flight Deck Department',
-      'Manage your departments activity',
-      'Distributing internal releases to your department',
-      'Remaining active',
-      'Provide information and resolve passenger queries',
-      'Taking initiative over your department and solving issues where needed'
-    ]
-  },
 ]
 
 export function getJobById(id: string): Job | undefined {
