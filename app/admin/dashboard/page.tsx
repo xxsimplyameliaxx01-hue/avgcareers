@@ -327,10 +327,6 @@ export default function AdminDashboard() {
                   <p className="font-medium">{selectedApp.discordUsername}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Hours per Week</Label>
-                  <p className="font-medium">{selectedApp.hoursPerWeek}</p>
-                </div>
-                <div>
                   <Label className="text-muted-foreground">Availability</Label>
                   <p className="font-medium">{selectedApp.availability}</p>
                 </div>
@@ -342,21 +338,21 @@ export default function AdminDashboard() {
                 </p>
               </div>
               <div>
-                <Label className="text-muted-foreground">Why This Role?</Label>
+                <Label className="text-muted-foreground">Why are you the ideal candidate for the role?</Label>
                 <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">
                   {selectedApp.whyRole}
                 </p>
               </div>
               <div>
-                <Label className="text-muted-foreground">Why avio group?</Label>
+                <Label className="text-muted-foreground">What qualities align with the role?</Label>
                 <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">
-                  {selectedApp.whyAvioGroup}
+                  {selectedApp.whatMakesYouFit}
                 </p>
               </div>
               <div>
-                <Label className="text-muted-foreground">What Makes You a Good Fit?</Label>
+                <Label className="text-muted-foreground">Why are you the ideal fit for avio group?</Label>
                 <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">
-                  {selectedApp.whatMakesYouFit}
+                  {selectedApp.whyAvioGroup}
                 </p>
               </div>
               <div>

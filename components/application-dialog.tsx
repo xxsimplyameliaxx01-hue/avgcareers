@@ -42,7 +42,6 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
     discordUsername: '',
     // Experience
     previousExperience: '',
-    hoursPerWeek: '',
     // Personal Questions
     whyThisRole: '',
     whyAvioGroup: '',
@@ -68,7 +67,6 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
             robloxUsername: formData.robloxUsername,
             discordUsername: formData.discordUsername,
             experience: formData.previousExperience,
-            hoursPerWeek: formData.hoursPerWeek,
             whyRole: formData.whyThisRole,
             whyAvioGroup: formData.whyAvioGroup,
             whatMakesYouFit: formData.strengths,
@@ -96,7 +94,6 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
         robloxUsername: formData.robloxUsername,
         discordUsername: formData.discordUsername,
         experience: formData.previousExperience,
-        hoursPerWeek: formData.hoursPerWeek,
         whyRole: formData.whyThisRole,
         whyAvioGroup: formData.whyAvioGroup,
         whatMakesYouFit: formData.strengths,
@@ -124,7 +121,6 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
       robloxUsername: '',
       discordUsername: '',
       previousExperience: '',
-      hoursPerWeek: '',
       whyThisRole: '',
       whyAvioGroup: '',
       strengths: '',
@@ -138,7 +134,7 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1))
 
   const isStep1Valid = formData.robloxUsername && formData.discordUsername
-  const isStep2Valid = formData.previousExperience && formData.hoursPerWeek
+  const isStep2Valid = formData.previousExperience
   const isStep3Valid = formData.whyThisRole && formData.whyAvioGroup && formData.strengths && formData.availability
 
   return (
@@ -215,24 +211,6 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
                   rows={5}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="hoursPerWeek">How many hours per week can you commit? *</Label>
-                <Select
-                  value={formData.hoursPerWeek}
-                  onValueChange={(value) => setFormData({ ...formData, hoursPerWeek: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your availability" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1-5">1-5 hours</SelectItem>
-                    <SelectItem value="5-10">5-10 hours</SelectItem>
-                    <SelectItem value="10-15">10-15 hours</SelectItem>
-                    <SelectItem value="15-20">15-20 hours</SelectItem>
-                    <SelectItem value="20+">20+ hours</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </>
           )}
 
@@ -240,35 +218,35 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
           {step === 3 && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="whyThisRole">Why do you want this role? *</Label>
+                <Label htmlFor="whyThisRole">Why are you the ideal candidate for the position of {job.title}? *</Label>
                 <Textarea
                   id="whyThisRole"
                   required
                   value={formData.whyThisRole}
                   onChange={(e) => setFormData({ ...formData, whyThisRole: e.target.value })}
-                  placeholder={`Tell us why you're interested in the ${job.title} position and what attracts you to this type of role.`}
+                  placeholder={`Tell us why you're the ideal candidate for the ${job.title} position.`}
                   rows={4}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="whyAvioGroup">Why do you want to join avio group? *</Label>
-                <Textarea
-                  id="whyAvioGroup"
-                  required
-                  value={formData.whyAvioGroup}
-                  onChange={(e) => setFormData({ ...formData, whyAvioGroup: e.target.value })}
-                  placeholder="What appeals to you about avio group? What do you know about us and our community?"
-                  rows={4}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="strengths">What makes you the right fit for this role? *</Label>
+                <Label htmlFor="strengths">What qualities do you have that align with those for {job.title}? *</Label>
                 <Textarea
                   id="strengths"
                   required
                   value={formData.strengths}
                   onChange={(e) => setFormData({ ...formData, strengths: e.target.value })}
-                  placeholder="Describe your key strengths and qualities that make you suitable for this position. What skills or traits do you bring to the team?"
+                  placeholder={`Describe the qualities and skills you have that align with what's needed for the ${job.title} role.`}
+                  rows={4}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="whyAvioGroup">Why are you the ideal fit for avio group? *</Label>
+                <Textarea
+                  id="whyAvioGroup"
+                  required
+                  value={formData.whyAvioGroup}
+                  onChange={(e) => setFormData({ ...formData, whyAvioGroup: e.target.value })}
+                  placeholder="Tell us why you're the ideal fit for avio group and what you'd bring to our community."
                   rows={4}
                 />
               </div>

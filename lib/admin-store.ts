@@ -16,7 +16,6 @@ export interface SubmittedApplication {
   robloxUsername: string
   discordUsername: string
   experience: string
-  hoursPerWeek: string
   whyRole: string
   whyAvioGroup: string
   whatMakesYouFit: string

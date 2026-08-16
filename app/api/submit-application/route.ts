@@ -27,23 +27,18 @@ export async function POST(request: NextRequest) {
           inline: false
         },
         {
-          name: 'Hours Available Per Week',
-          value: formData.hoursPerWeek || 'Not provided',
-          inline: true
-        },
-        {
-          name: 'Why do you want this role?',
+          name: 'Why are you the ideal candidate for the role?',
           value: formData.whyRole || 'Not provided',
           inline: false
         },
         {
-          name: 'Why avio group?',
-          value: formData.whyAvioGroup || 'Not provided',
+          name: 'What qualities align with the role?',
+          value: formData.whatMakesYouFit || 'Not provided',
           inline: false
         },
         {
-          name: 'What makes you a good fit?',
-          value: formData.whatMakesYouFit || 'Not provided',
+          name: 'Why are you the ideal fit for avio group?',
+          value: formData.whyAvioGroup || 'Not provided',
           inline: false
         },
         {
