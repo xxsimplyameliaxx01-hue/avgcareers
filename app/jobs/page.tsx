@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { JobCard } from '@/components/job-card'
@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { jobs, departments, locations, types } from '@/lib/jobs-data'
+import { jobs, departments, locations, types, Job } from '@/lib/jobs-data'
+import { getAllJobs } from '@/lib/open-roles-store'
 import { Search, X, SlidersHorizontal } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 
@@ -17,9 +18,14 @@ export default function JobsPage() {
   const [department, setDepartment] = useState<string>('all')
   const [location, setLocation] = useState<string>('all')
   const [type, setType] = useState<string>('all')
+  const [availableJobs, setAvailableJobs] = useState<Job[]>(jobs)
+
+  useEffect(() => {
+    setAvailableJobs(getAllJobs())
+  }, [])
 
   const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
+    return availableJobs.filter((job) => {
       const matchesSearch = search === '' || 
         job.title.toLowerCase().includes(search.toLowerCase()) ||
         job.description.toLowerCase().includes(search.toLowerCase())
@@ -28,7 +34,7 @@ export default function JobsPage() {
       const matchesType = type === 'all' || job.type === type
       return matchesSearch && matchesDepartment && matchesLocation && matchesType
     })
-  }, [search, department, location, type])
+  }, [availableJobs, search, department, location, type])
 
   const activeFiltersCount = [department, location, type].filter(f => f !== 'all').length
 

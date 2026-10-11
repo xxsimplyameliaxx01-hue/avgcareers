@@ -10,16 +10,21 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { getJobById, jobs, Job } from '@/lib/jobs-data'
+import { getAllJobs } from '@/lib/open-roles-store'
 import { hasAppliedToJob, getApplicationByJobId, getStatusLabel, getStatusColor, removeApplicationByJobId } from '@/lib/applications-store'
 import { ArrowLeft, MapPin, Briefcase, Clock, DollarSign, Building, CheckCircle, Trash2 } from 'lucide-react'
 import { ApplicationDialog } from '@/components/application-dialog'
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
-  const job = getJobById(resolvedParams.id)
+  const [job, setJob] = useState<Job | undefined>(() => getJobById(resolvedParams.id))
   const [hasApplied, setHasApplied] = useState(false)
   const [applicationStatus, setApplicationStatus] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  useEffect(() => {
+    setJob(getAllJobs().find((item) => item.id === resolvedParams.id))
+  }, [resolvedParams.id])
 
   useEffect(() => {
     if (job) {
@@ -38,7 +43,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     notFound()
   }
 
-  const relatedJobs = jobs.filter(j => j.department === job.department && j.id !== job.id).slice(0, 2)
+  const relatedJobs = getAllJobs().filter(j => j.department === job.department && j.id !== job.id).slice(0, 2)
 
   const handleApplicationSuccess = () => {
     setHasApplied(true)
