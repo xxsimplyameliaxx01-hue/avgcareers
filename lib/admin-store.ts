@@ -19,6 +19,7 @@ export interface SubmittedApplication {
   whyRole: string
   whyAvioGroup: string
   whatMakesYouFit: string
+  answers?: Record<string, string>
   difficultSituation: string
   availability: string
   submittedAt: string
@@ -89,6 +90,16 @@ export function setCurrentUser(username: string): void {
 // Clear current user (logout)
 export function clearCurrentUser(): void {
   localStorage.removeItem(CURRENT_USER_KEY)
+}
+
+export function subscribeToSubmittedApplications(onChange: (applications: SubmittedApplication[]) => void): () => void {
+  if (typeof window === 'undefined') return () => {}
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === SUBMITTED_APPLICATIONS_KEY) onChange(getSubmittedApplications())
+  }
+  window.addEventListener('storage', handleStorage)
+  return () => window.removeEventListener('storage', handleStorage)
 }
 
 // Get all submitted applications

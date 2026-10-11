@@ -20,7 +20,7 @@ import {
 } from '@/lib/admin-store'
 import { toast } from 'sonner'
 import { jobs } from '@/lib/jobs-data'
-import { ApplicationQuestion, defaultApplicationQuestions, getApplicationQuestions, saveApplicationQuestions } from '@/lib/application-forms-store'
+import { ApplicationQuestion, ApplicationTemplate, defaultApplicationQuestions, getApplicationQuestions, saveApplicationQuestions, createApplicationTemplate, getApplicationTemplates, saveApplicationTemplate, deleteApplicationTemplate } from '@/lib/application-forms-store'
 import { ArrowLeft, UserPlus, Trash2, Shield, Crown, Plus, Save, Pencil } from 'lucide-react'
 
 export default function ManageAdminsPage() {
@@ -32,10 +32,18 @@ export default function ManageAdminsPage() {
   const [selectedJobId, setSelectedJobId] = useState(jobs[0]?.id ?? '')
   const [questions, setQuestions] = useState<ApplicationQuestion[]>([])
   const [newQuestion, setNewQuestion] = useState('')
+  const [templates, setTemplates] = useState<ApplicationTemplate[]>([])
+  const [newApplicationTitle, setNewApplicationTitle] = useState('')
 
   useEffect(() => {
-    if (selectedJobId) setQuestions(getApplicationQuestions(selectedJobId))
-  }, [selectedJobId])
+    setTemplates(getApplicationTemplates())
+  }, [])
+
+  useEffect(() => {
+    if (!selectedJobId) return
+    const template = templates.find((item) => item.id === selectedJobId)
+    setQuestions(template?.questions ?? getApplicationQuestions(selectedJobId))
+  }, [selectedJobId, templates])
 
   useEffect(() => {
     const user = getCurrentUser()
@@ -104,6 +112,40 @@ export default function ManageAdminsPage() {
     setQuestions(defaultApplicationQuestions)
     saveApplicationQuestions(selectedJobId, defaultApplicationQuestions)
     toast.success('Default questions restored')
+  }
+
+  const createApplication = () => {
+    const title = newApplicationTitle.trim()
+    if (!title) {
+      toast.error('Enter an application name')
+      return
+    }
+    const template = createApplicationTemplate(title)
+    setTemplates(getApplicationTemplates())
+    setSelectedJobId(template.id)
+    setQuestions(template.questions)
+    setNewApplicationTitle('')
+    toast.success('Application created')
+  }
+
+  const saveQuestionsForSelection = () => {
+    const template = templates.find((item) => item.id === selectedJobId)
+    if (template) {
+      saveApplicationTemplate({ ...template, questions })
+      setTemplates(getApplicationTemplates())
+    } else {
+      saveApplicationQuestions(selectedJobId, questions)
+    }
+    toast.success('Application questions saved')
+  }
+
+  const removeCreatedApplication = () => {
+    if (!templates.some((item) => item.id === selectedJobId)) return
+    deleteApplicationTemplate(selectedJobId)
+    const next = getApplicationTemplates()
+    setTemplates(next)
+    setSelectedJobId(jobs[0]?.id ?? '')
+    toast.success('Application deleted')
   }
 
   if (isCheckingAuth) {
@@ -183,8 +225,31 @@ export default function ManageAdminsPage() {
                   onChange={(event) => setSelectedJobId(event.target.value)}
                   className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                 >
-                  {jobs.map((job) => <option key={job.id} value={job.id}>{job.title}</option>)}
+                  <optgroup label="Open roles">
+                    {jobs.map((job) => <option key={job.id} value={job.id}>{job.title}</option>)}
+                  </optgroup>
+                  {templates.length > 0 && (
+                    <optgroup label="Created applications">
+                      {templates.map((template) => <option key={template.id} value={template.id}>{template.title}</option>)}
+                    </optgroup>
+                  )}
                 </select>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Input
+                    value={newApplicationTitle}
+                    onChange={(event) => setNewApplicationTitle(event.target.value)}
+                    placeholder="New application name"
+                    aria-label="New application name"
+                  />
+                  <Button type="button" variant="outline" onClick={createApplication}>
+                    <Plus className="mr-2 h-4 w-4" /> Create application
+                  </Button>
+                  {templates.some((template) => template.id === selectedJobId) && (
+                    <Button type="button" variant="ghost" onClick={removeCreatedApplication}>
+                      <Trash2 className="mr-2 h-4 w-4" /> Delete
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="flex flex-col gap-3">
                 {questions.map((question, index) => (
@@ -218,7 +283,7 @@ export default function ManageAdminsPage() {
                 </Button>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button type="button" onClick={saveQuestions}>
+                <Button type="button" onClick={saveQuestionsForSelection}>
                   <Save className="mr-2 h-4 w-4" /> Save application
                 </Button>
                 <Button type="button" variant="ghost" onClick={resetQuestions}>Restore defaults</Button>

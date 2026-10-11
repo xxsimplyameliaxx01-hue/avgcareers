@@ -7,7 +7,7 @@ import { Footer } from '@/components/footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { getApplications, getStatusLabel, getStatusColor, removeApplication, Application } from '@/lib/applications-store'
+import { getApplications, subscribeToApplications, getStatusLabel, getStatusColor, removeApplication, Application } from '@/lib/applications-store'
 import { FileText, ArrowRight, Calendar, Building, Briefcase, Trash2 } from 'lucide-react'
 
 export default function ApplicationsPage() {
@@ -17,6 +17,7 @@ export default function ApplicationsPage() {
   useEffect(() => {
     setApplications(getApplications())
     setIsLoading(false)
+    return subscribeToApplications(setApplications)
   }, [])
 
   const formatDate = (dateString: string) => {

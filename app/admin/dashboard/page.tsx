@@ -25,12 +25,14 @@ import {
 } from '@/components/ui/select'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
+import { updateApplicationStatusByJob } from '@/lib/applications-store'
 import { 
   getCurrentUser, 
   clearCurrentUser, 
   isAdmin, 
   isSuperAdmin,
   getSubmittedApplications,
+  subscribeToSubmittedApplications,
   updateApplicationStatus,
   type SubmittedApplication,
   type ApplicationStatus
@@ -59,6 +61,7 @@ export default function AdminDashboard() {
     setCurrentUserState(user)
     setApplications(getSubmittedApplications())
     setIsCheckingAuth(false)
+    return subscribeToSubmittedApplications(setApplications)
   }, [router])
 
   const handleLogout = () => {
@@ -84,6 +87,8 @@ export default function AdminDashboard() {
       if (!updated) {
         throw new Error('Failed to update application')
       }
+
+      updateApplicationStatusByJob(selectedApp.jobTitle, decision === 'accepted' ? 'offer' : 'rejected')
 
       // Send Discord notification
       await fetch('/api/notify-decision', {
