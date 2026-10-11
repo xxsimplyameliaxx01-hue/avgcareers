@@ -1,6 +1,19 @@
 'use client'
 import { Application } from './jobs-data'
+export type { Application } from './jobs-data'
+
 const STORAGE_KEY = 'avio-applications'
+
+export function subscribeToApplications(onChange: (applications: Application[]) => void): () => void {
+  if (typeof window === 'undefined') return () => {}
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === STORAGE_KEY) onChange(getApplications())
+  }
+  window.addEventListener('storage', handleStorage)
+  return () => window.removeEventListener('storage', handleStorage)
+}
+
 export function getApplications(): Application[] {
   if (typeof window === 'undefined') return []
   const stored = localStorage.getItem(STORAGE_KEY)
