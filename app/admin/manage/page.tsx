@@ -37,11 +37,24 @@ export default function ManageAdminsPage() {
   const [newApplicationTitle, setNewApplicationTitle] = useState('')
   const [openRoles, setOpenRoles] = useState<Job[]>([])
   const [newRole, setNewRole] = useState({ title: '', department: '', location: 'England', type: 'Flexible' as Job['type'], salary: 'Competitive', description: '', requirements: '', responsibilities: '' })
+  const [editingRole, setEditingRole] = useState<Job | null>(null)
 
   useEffect(() => {
     setTemplates(getApplicationTemplates())
     setOpenRoles(getOpenRoles())
   }, [])
+
+  const handleSaveRole = (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!editingRole || !editingRole.title.trim() || !editingRole.department.trim() || !editingRole.description.trim()) {
+      toast.error('Complete the role title, department, and description')
+      return
+    }
+    saveOpenRole({ ...editingRole, title: editingRole.title.trim(), department: editingRole.department.trim(), description: editingRole.description.trim(), requirements: editingRole.requirements.map((item) => item.trim()).filter(Boolean), responsibilities: editingRole.responsibilities.map((item) => item.trim()).filter(Boolean) })
+    setOpenRoles(getOpenRoles())
+    setSelectedJobId(editingRole.id)
+    toast.success('Role updated')
+  }
 
   const handleCreateRole = (event: React.FormEvent) => {
     event.preventDefault()
@@ -72,6 +85,7 @@ export default function ManageAdminsPage() {
     if (!selectedJobId) return
     const template = templates.find((item) => item.id === selectedJobId)
     setQuestions(template?.questions ?? getApplicationQuestions(selectedJobId))
+    setEditingRole(getAllJobs().find((role) => role.id === selectedJobId) ?? null)
   }, [selectedJobId, templates])
 
   useEffect(() => {
@@ -319,6 +333,31 @@ export default function ManageAdminsPage() {
               </div>
             </CardContent>
           </Card>
+
+          {editingRole && (
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Edit Open Role</CardTitle>
+                <CardDescription>Update any role details. Changes are used everywhere the role appears.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSaveRole} className="flex flex-col gap-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="flex flex-col gap-2"><Label htmlFor="edit-role-title">Role title</Label><Input id="edit-role-title" value={editingRole.title} onChange={(e) => setEditingRole({ ...editingRole, title: e.target.value })} /></div>
+                    <div className="flex flex-col gap-2"><Label htmlFor="edit-role-department">Department</Label><Input id="edit-role-department" value={editingRole.department} onChange={(e) => setEditingRole({ ...editingRole, department: e.target.value })} /></div>
+                    <div className="flex flex-col gap-2"><Label htmlFor="edit-role-location">Location</Label><Input id="edit-role-location" value={editingRole.location} onChange={(e) => setEditingRole({ ...editingRole, location: e.target.value })} /></div>
+                    <div className="flex flex-col gap-2"><Label htmlFor="edit-role-salary">Salary</Label><Input id="edit-role-salary" value={editingRole.salary} onChange={(e) => setEditingRole({ ...editingRole, salary: e.target.value })} /></div>
+                  </div>
+                  <div className="flex flex-col gap-2"><Label htmlFor="edit-role-description">Description</Label><textarea id="edit-role-description" value={editingRole.description} onChange={(e) => setEditingRole({ ...editingRole, description: e.target.value })} className="min-h-24 rounded-md border border-input bg-background px-3 py-2 text-sm" /></div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="flex flex-col gap-2"><Label htmlFor="edit-role-requirements">Requirements</Label><textarea id="edit-role-requirements" value={editingRole.requirements.join('\n')} onChange={(e) => setEditingRole({ ...editingRole, requirements: e.target.value.split('\n') })} className="min-h-28 rounded-md border border-input bg-background px-3 py-2 text-sm" /></div>
+                    <div className="flex flex-col gap-2"><Label htmlFor="edit-role-responsibilities">Responsibilities</Label><textarea id="edit-role-responsibilities" value={editingRole.responsibilities.join('\n')} onChange={(e) => setEditingRole({ ...editingRole, responsibilities: e.target.value.split('\n') })} className="min-h-28 rounded-md border border-input bg-background px-3 py-2 text-sm" /></div>
+                  </div>
+                  <Button type="submit" className="self-start"><Save className="mr-2 h-4 w-4" /> Save role changes</Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="mb-8">
             <CardHeader>

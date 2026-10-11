@@ -3,20 +3,31 @@
 import { Job, jobs } from '@/lib/jobs-data'
 
 const STORAGE_KEY = 'avio-open-roles'
+const OVERRIDES_KEY = 'avio-role-overrides'
 
-export function getOpenRoles(): Job[] {
+function readRoles(key: string): Job[] {
   if (typeof window === 'undefined') return []
   try {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
+    const stored = window.localStorage.getItem(key)
     return stored ? JSON.parse(stored) : []
   } catch {
     return []
   }
 }
 
+export function getOpenRoles(): Job[] {
+  return readRoles(STORAGE_KEY)
+}
+
+function getRoleOverrides(): Job[] {
+  return readRoles(OVERRIDES_KEY)
+}
+
 export function saveOpenRole(role: Job): void {
-  const roles = getOpenRoles().filter((item) => item.id !== role.id)
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...roles, role]))
+  const isBuiltIn = jobs.some((item) => item.id === role.id)
+  const key = isBuiltIn ? OVERRIDES_KEY : STORAGE_KEY
+  const roles = (isBuiltIn ? getRoleOverrides() : getOpenRoles()).filter((item) => item.id !== role.id)
+  window.localStorage.setItem(key, JSON.stringify([...roles, role]))
 }
 
 export function deleteOpenRole(id: string): void {
@@ -24,6 +35,8 @@ export function deleteOpenRole(id: string): void {
 }
 
 export function getAllJobs(): Job[] {
+  const overrides = new Map(getRoleOverrides().map((role) => [role.id, role]))
+  const publishedJobs = jobs.map((role) => overrides.get(role.id) ?? role)
   const customRoles = getOpenRoles()
-  return [...jobs, ...customRoles]
+  return [...publishedJobs, ...customRoles]
 }
