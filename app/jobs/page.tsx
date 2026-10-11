@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { jobs, departments, locations, types, Job } from '@/lib/jobs-data'
+import { jobs, Job } from '@/lib/jobs-data'
 import { getAllJobs } from '@/lib/open-roles-store'
 import { Search, X, SlidersHorizontal } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -23,6 +23,10 @@ export default function JobsPage() {
   useEffect(() => {
     setAvailableJobs(getAllJobs())
   }, [])
+
+  const departments = [...new Set(availableJobs.map((job) => job.department))]
+  const locations = [...new Set(availableJobs.map((job) => job.location))]
+  const types = [...new Set(availableJobs.map((job) => job.type))]
 
   const filteredJobs = useMemo(() => {
     return availableJobs.filter((job) => {

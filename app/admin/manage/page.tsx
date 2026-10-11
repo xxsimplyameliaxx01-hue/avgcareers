@@ -20,7 +20,7 @@ import {
 } from '@/lib/admin-store'
 import { toast } from 'sonner'
 import { jobs, Job } from '@/lib/jobs-data'
-import { getOpenRoles, saveOpenRole, deleteOpenRole } from '@/lib/open-roles-store'
+import { getAllJobs, getOpenRoles, saveOpenRole, deleteOpenRole } from '@/lib/open-roles-store'
 import { ApplicationQuestion, ApplicationTemplate, defaultApplicationQuestions, getApplicationQuestions, saveApplicationQuestions, createApplicationTemplate, getApplicationTemplates, saveApplicationTemplate, deleteApplicationTemplate } from '@/lib/application-forms-store'
 import { ArrowLeft, UserPlus, Trash2, Shield, Crown, Plus, Save, Pencil } from 'lucide-react'
 
@@ -30,7 +30,7 @@ export default function ManageAdminsPage() {
   const [admins, setAdmins] = useState<string[]>([])
   const [newAdmin, setNewAdmin] = useState('')
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-  const [selectedJobId, setSelectedJobId] = useState(jobs[0]?.id ?? '')
+  const [selectedJobId, setSelectedJobId] = useState(getAllJobs()[0]?.id ?? '')
   const [questions, setQuestions] = useState<ApplicationQuestion[]>([])
   const [newQuestion, setNewQuestion] = useState('')
   const [templates, setTemplates] = useState<ApplicationTemplate[]>([])
@@ -173,7 +173,7 @@ export default function ManageAdminsPage() {
     deleteApplicationTemplate(selectedJobId)
     const next = getApplicationTemplates()
     setTemplates(next)
-    setSelectedJobId(jobs[0]?.id ?? '')
+    setSelectedJobId(getAllJobs()[0]?.id ?? '')
     toast.success('Application deleted')
   }
 
@@ -255,7 +255,7 @@ export default function ManageAdminsPage() {
                   className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                 >
                   <optgroup label="Open roles">
-                    {jobs.map((job) => <option key={job.id} value={job.id}>{job.title}</option>)}
+                    {getAllJobs().map((job) => <option key={job.id} value={job.id}>{job.title}</option>)}
                   </optgroup>
                   {templates.length > 0 && (
                     <optgroup label="Created applications">
