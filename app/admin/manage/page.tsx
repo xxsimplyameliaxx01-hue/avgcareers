@@ -19,7 +19,8 @@ import {
   SUPER_ADMIN
 } from '@/lib/admin-store'
 import { toast } from 'sonner'
-import { jobs } from '@/lib/jobs-data'
+import { jobs, Job } from '@/lib/jobs-data'
+import { getAllJobs, getOpenRoles, saveOpenRole, deleteOpenRole } from '@/lib/open-roles-store'
 import { ApplicationQuestion, ApplicationTemplate, defaultApplicationQuestions, getApplicationQuestions, saveApplicationQuestions, createApplicationTemplate, getApplicationTemplates, saveApplicationTemplate, deleteApplicationTemplate } from '@/lib/application-forms-store'
 import { ArrowLeft, UserPlus, Trash2, Shield, Crown, Plus, Save, Pencil } from 'lucide-react'
 
@@ -29,15 +30,43 @@ export default function ManageAdminsPage() {
   const [admins, setAdmins] = useState<string[]>([])
   const [newAdmin, setNewAdmin] = useState('')
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-  const [selectedJobId, setSelectedJobId] = useState(jobs[0]?.id ?? '')
+  const [selectedJobId, setSelectedJobId] = useState(getAllJobs()[0]?.id ?? '')
   const [questions, setQuestions] = useState<ApplicationQuestion[]>([])
   const [newQuestion, setNewQuestion] = useState('')
   const [templates, setTemplates] = useState<ApplicationTemplate[]>([])
   const [newApplicationTitle, setNewApplicationTitle] = useState('')
+  const [openRoles, setOpenRoles] = useState<Job[]>([])
+  const [newRole, setNewRole] = useState({ title: '', department: '', location: 'England', type: 'Flexible' as Job['type'], salary: 'Competitive', description: '', requirements: '', responsibilities: '' })
 
   useEffect(() => {
     setTemplates(getApplicationTemplates())
+    setOpenRoles(getOpenRoles())
   }, [])
+
+  const handleCreateRole = (event: React.FormEvent) => {
+    event.preventDefault()
+    const title = newRole.title.trim()
+    if (!title || !newRole.department.trim() || !newRole.description.trim()) {
+      toast.error('Complete the role title, department, and description')
+      return
+    }
+    const role: Job = {
+      id: `custom-role-${Date.now()}`,
+      title,
+      department: newRole.department.trim(),
+      location: newRole.location.trim() || 'England',
+      type: newRole.type,
+      salary: newRole.salary.trim() || 'Competitive',
+      posted: 'Just now',
+      description: newRole.description.trim(),
+      requirements: newRole.requirements.split('\\n').map((item) => item.trim()).filter(Boolean),
+      responsibilities: newRole.responsibilities.split('\\n').map((item) => item.trim()).filter(Boolean),
+    }
+    saveOpenRole(role)
+    setOpenRoles(getOpenRoles())
+    setNewRole({ title: '', department: '', location: 'England', type: 'Flexible', salary: 'Competitive', description: '', requirements: '', responsibilities: '' })
+    toast.success('Open role created', { description: `${title} is now visible on the Open Positions page.` })
+  }
 
   useEffect(() => {
     if (!selectedJobId) return
@@ -144,7 +173,7 @@ export default function ManageAdminsPage() {
     deleteApplicationTemplate(selectedJobId)
     const next = getApplicationTemplates()
     setTemplates(next)
-    setSelectedJobId(jobs[0]?.id ?? '')
+    setSelectedJobId(getAllJobs()[0]?.id ?? '')
     toast.success('Application deleted')
   }
 
@@ -226,7 +255,7 @@ export default function ManageAdminsPage() {
                   className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                 >
                   <optgroup label="Open roles">
-                    {jobs.map((job) => <option key={job.id} value={job.id}>{job.title}</option>)}
+                    {getAllJobs().map((job) => <option key={job.id} value={job.id}>{job.title}</option>)}
                   </optgroup>
                   {templates.length > 0 && (
                     <optgroup label="Created applications">
@@ -288,6 +317,30 @@ export default function ManageAdminsPage() {
                 </Button>
                 <Button type="button" variant="ghost" onClick={resetQuestions}>Restore defaults</Button>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Create an Open Role</CardTitle>
+              <CardDescription>Publish a new role to the public Open Positions page.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleCreateRole} className="flex flex-col gap-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="flex flex-col gap-2"><Label htmlFor="role-title">Role title</Label><Input id="role-title" value={newRole.title} onChange={(e) => setNewRole({ ...newRole, title: e.target.value })} placeholder="e.g. Flight Dispatcher" /></div>
+                  <div className="flex flex-col gap-2"><Label htmlFor="role-department">Department</Label><Input id="role-department" value={newRole.department} onChange={(e) => setNewRole({ ...newRole, department: e.target.value })} placeholder="e.g. Flight Operations" /></div>
+                  <div className="flex flex-col gap-2"><Label htmlFor="role-location">Location</Label><Input id="role-location" value={newRole.location} onChange={(e) => setNewRole({ ...newRole, location: e.target.value })} /></div>
+                  <div className="flex flex-col gap-2"><Label htmlFor="role-salary">Salary</Label><Input id="role-salary" value={newRole.salary} onChange={(e) => setNewRole({ ...newRole, salary: e.target.value })} /></div>
+                </div>
+                <div className="flex flex-col gap-2"><Label htmlFor="role-description">Description</Label><textarea id="role-description" value={newRole.description} onChange={(e) => setNewRole({ ...newRole, description: e.target.value })} className="min-h-24 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Describe the role" /></div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="flex flex-col gap-2"><Label htmlFor="role-requirements">Requirements</Label><textarea id="role-requirements" value={newRole.requirements} onChange={(e) => setNewRole({ ...newRole, requirements: e.target.value })} className="min-h-28 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="One requirement per line" /></div>
+                  <div className="flex flex-col gap-2"><Label htmlFor="role-responsibilities">Responsibilities</Label><textarea id="role-responsibilities" value={newRole.responsibilities} onChange={(e) => setNewRole({ ...newRole, responsibilities: e.target.value })} className="min-h-28 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="One responsibility per line" /></div>
+                </div>
+                <Button type="submit" className="self-start"><Plus className="mr-2 h-4 w-4" /> Create open role</Button>
+              </form>
+              {openRoles.length > 0 && <div className="mt-6 flex flex-col gap-3"><h3 className="font-medium">Created open roles</h3>{openRoles.map((role) => <div key={role.id} className="flex items-center justify-between rounded-lg border p-3"><span>{role.title}</span><Button type="button" variant="ghost" size="sm" onClick={() => { deleteOpenRole(role.id); setOpenRoles(getOpenRoles()); toast.success('Role deleted') }}><Trash2 className="mr-2 h-4 w-4" /> Delete</Button></div>)}</div>}
             </CardContent>
           </Card>
 
