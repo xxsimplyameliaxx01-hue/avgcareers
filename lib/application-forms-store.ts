@@ -8,6 +8,47 @@ export type ApplicationQuestion = {
 }
 
 const STORAGE_KEY = 'avio-application-questions'
+const APPLICATIONS_KEY = 'avio-application-templates'
+
+export type ApplicationTemplate = {
+  id: string
+  title: string
+  questions: ApplicationQuestion[]
+}
+
+function readTemplates(): ApplicationTemplate[] {
+  if (typeof window === 'undefined') return []
+  const stored = window.localStorage.getItem(APPLICATIONS_KEY)
+  return stored ? JSON.parse(stored) : []
+}
+
+export function getApplicationTemplates(): ApplicationTemplate[] {
+  return readTemplates()
+}
+
+export function createApplicationTemplate(title: string): ApplicationTemplate {
+  const template: ApplicationTemplate = {
+    id: `custom-${Date.now()}`,
+    title,
+    questions: defaultApplicationQuestions.map((question) => ({ ...question })),
+  }
+  const templates = readTemplates()
+  window.localStorage.setItem(APPLICATIONS_KEY, JSON.stringify([...templates, template]))
+  return template
+}
+
+export function deleteApplicationTemplate(id: string) {
+  window.localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(readTemplates().filter((template) => template.id !== id)))
+}
+
+export function saveApplicationTemplate(template: ApplicationTemplate) {
+  const templates = readTemplates()
+  const nextTemplates = templates.some((item) => item.id === template.id)
+    ? templates.map((item) => item.id === template.id ? template : item)
+    : [...templates, template]
+  window.localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(nextTemplates))
+}
+
 
 export const defaultApplicationQuestions: ApplicationQuestion[] = [
   { id: 'ideal-candidate', label: 'Why are you the ideal candidate for the position of [role]?', placeholder: 'Explain why you are the ideal candidate.', required: true },
