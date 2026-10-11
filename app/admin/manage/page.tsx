@@ -19,7 +19,9 @@ import {
   SUPER_ADMIN
 } from '@/lib/admin-store'
 import { toast } from 'sonner'
-import { ArrowLeft, UserPlus, Trash2, Shield, Crown } from 'lucide-react'
+import { jobs } from '@/lib/jobs-data'
+import { ApplicationQuestion, defaultApplicationQuestions, getApplicationQuestions, saveApplicationQuestions } from '@/lib/application-forms-store'
+import { ArrowLeft, UserPlus, Trash2, Shield, Crown, Plus, Save, Pencil } from 'lucide-react'
 
 export default function ManageAdminsPage() {
   const router = useRouter()
@@ -27,6 +29,13 @@ export default function ManageAdminsPage() {
   const [admins, setAdmins] = useState<string[]>([])
   const [newAdmin, setNewAdmin] = useState('')
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  const [selectedJobId, setSelectedJobId] = useState(jobs[0]?.id ?? '')
+  const [questions, setQuestions] = useState<ApplicationQuestion[]>([])
+  const [newQuestion, setNewQuestion] = useState('')
+
+  useEffect(() => {
+    if (selectedJobId) setQuestions(getApplicationQuestions(selectedJobId))
+  }, [selectedJobId])
 
   useEffect(() => {
     const user = getCurrentUser()
@@ -71,6 +80,30 @@ export default function ManageAdminsPage() {
         description: `${username} no longer has admin access.`,
       })
     }
+  }
+
+  const updateQuestion = (id: string, label: string) => {
+    setQuestions((current) => current.map((question) => question.id === id ? { ...question, label } : question))
+  }
+
+  const addQuestion = () => {
+    const label = newQuestion.trim()
+    if (!label) return
+    setQuestions((current) => [...current, { id: `custom-${Date.now()}`, label, placeholder: 'Type your answer here.', required: true }])
+    setNewQuestion('')
+  }
+
+  const removeQuestion = (id: string) => setQuestions((current) => current.filter((question) => question.id !== id))
+
+  const saveQuestions = () => {
+    saveApplicationQuestions(selectedJobId, questions)
+    toast.success('Application questions saved')
+  }
+
+  const resetQuestions = () => {
+    setQuestions(defaultApplicationQuestions)
+    saveApplicationQuestions(selectedJobId, defaultApplicationQuestions)
+    toast.success('Default questions restored')
   }
 
   if (isCheckingAuth) {
@@ -128,6 +161,68 @@ export default function ManageAdminsPage() {
                   Add Admin
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Pencil className="h-5 w-5" />
+                Application Questions
+              </CardTitle>
+              <CardDescription>
+                Create an application for a role by editing its default questions. Changes appear on the public Apply form.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="application-role">Application role</Label>
+                <select
+                  id="application-role"
+                  value={selectedJobId}
+                  onChange={(event) => setSelectedJobId(event.target.value)}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  {jobs.map((job) => <option key={job.id} value={job.id}>{job.title}</option>)}
+                </select>
+              </div>
+              <div className="flex flex-col gap-3">
+                {questions.map((question, index) => (
+                  <div key={question.id} className="flex items-start gap-3 rounded-lg border p-3">
+                    <span className="pt-2 text-sm text-muted-foreground">{index + 1}</span>
+                    <Input
+                      value={question.label}
+                      onChange={(event) => updateQuestion(question.id, event.target.value)}
+                      aria-label={`Question ${index + 1}`}
+                    />
+                    <Button type="button" variant="ghost" size="icon" onClick={() => removeQuestion(question.id)} aria-label={`Delete question ${index + 1}`}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Input
+                  value={newQuestion}
+                  onChange={(event) => setNewQuestion(event.target.value)}
+                  placeholder="Add a new application question"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.nativeEvent.isComposing && event.keyCode !== 229) {
+                      event.preventDefault()
+                      addQuestion()
+                    }
+                  }}
+                />
+                <Button type="button" variant="outline" onClick={addQuestion}>
+                  <Plus className="mr-2 h-4 w-4" /> Add question
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button type="button" onClick={saveQuestions}>
+                  <Save className="mr-2 h-4 w-4" /> Save application
+                </Button>
+                <Button type="button" variant="ghost" onClick={resetQuestions}>Restore defaults</Button>
+              </div>
             </CardContent>
           </Card>
 

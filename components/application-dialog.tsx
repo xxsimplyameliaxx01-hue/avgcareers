@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -25,6 +25,7 @@ import { addApplication } from '@/lib/applications-store'
 import { addSubmittedApplication } from '@/lib/admin-store'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
+import { getApplicationQuestions, questionLabel, ApplicationQuestion } from '@/lib/application-forms-store'
 
 interface ApplicationDialogProps {
   job: Job
@@ -36,6 +37,8 @@ interface ApplicationDialogProps {
 export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: ApplicationDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [step, setStep] = useState(1)
+  const [questions, setQuestions] = useState<ApplicationQuestion[]>([])
+  const [answers, setAnswers] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState({
     // Account Details
     robloxUsername: '',
@@ -49,6 +52,12 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
     scenario: '',
     availability: '',
   })
+
+  useEffect(() => {
+    const configuredQuestions = getApplicationQuestions(job.id)
+    setQuestions(configuredQuestions)
+    setAnswers(Object.fromEntries(configuredQuestions.map((question) => [question.id, ''])))
+  }, [job.id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -67,10 +76,11 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
             robloxUsername: formData.robloxUsername,
             discordUsername: formData.discordUsername,
             experience: formData.previousExperience,
-            whyRole: formData.whyThisRole,
-            whyAvioGroup: formData.whyAvioGroup,
-            whatMakesYouFit: formData.strengths,
-            difficultSituation: formData.scenario,
+            answers,
+            whyRole: answers['ideal-candidate'] || '',
+            whyAvioGroup: answers['avio-fit'] || '',
+            whatMakesYouFit: answers['role-qualities'] || '',
+            difficultSituation: answers['scenario'] || '',
             availability: formData.availability,
           },
         }),
@@ -94,10 +104,11 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
         robloxUsername: formData.robloxUsername,
         discordUsername: formData.discordUsername,
         experience: formData.previousExperience,
-        whyRole: formData.whyThisRole,
-        whyAvioGroup: formData.whyAvioGroup,
-        whatMakesYouFit: formData.strengths,
-        difficultSituation: formData.scenario,
+        answers,
+        whyRole: answers['ideal-candidate'] || '',
+        whyAvioGroup: answers['avio-fit'] || '',
+        whatMakesYouFit: answers['role-qualities'] || '',
+        difficultSituation: answers['scenario'] || '',
         availability: formData.availability,
       })
 
@@ -127,6 +138,7 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
       scenario: '',
       availability: '',
     })
+    setAnswers(Object.fromEntries(questions.map((question) => [question.id, ''])))
     setStep(1)
   }
 
@@ -135,7 +147,7 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
 
   const isStep1Valid = formData.robloxUsername && formData.discordUsername
   const isStep2Valid = formData.previousExperience
-  const isStep3Valid = formData.whyThisRole && formData.whyAvioGroup && formData.strengths && formData.availability
+  const isStep3Valid = formData.availability && questions.filter((question) => question.required).every((question) => answers[question.id]?.trim())
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -217,49 +229,21 @@ export function ApplicationDialog({ job, open, onOpenChange, onSuccess }: Applic
           {/* Step 3: Personal Questions */}
           {step === 3 && (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="whyThisRole">Why are you the ideal candidate for the position of {job.title}? *</Label>
-                <Textarea
-                  id="whyThisRole"
-                  required
-                  value={formData.whyThisRole}
-                  onChange={(e) => setFormData({ ...formData, whyThisRole: e.target.value })}
-                  placeholder={`Tell us why you're the ideal candidate for the ${job.title} position.`}
-                  rows={4}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="strengths">What qualities do you have that align with those for {job.title}? *</Label>
-                <Textarea
-                  id="strengths"
-                  required
-                  value={formData.strengths}
-                  onChange={(e) => setFormData({ ...formData, strengths: e.target.value })}
-                  placeholder={`Describe the qualities and skills you have that align with what's needed for the ${job.title} role.`}
-                  rows={4}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="whyAvioGroup">Why are you the ideal fit for avio group? *</Label>
-                <Textarea
-                  id="whyAvioGroup"
-                  required
-                  value={formData.whyAvioGroup}
-                  onChange={(e) => setFormData({ ...formData, whyAvioGroup: e.target.value })}
-                  placeholder="Tell us why you're the ideal fit for avio group and what you'd bring to our community."
-                  rows={4}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="scenario">How would you handle a difficult passenger or situation?</Label>
-                <Textarea
-                  id="scenario"
-                  value={formData.scenario}
-                  onChange={(e) => setFormData({ ...formData, scenario: e.target.value })}
-                  placeholder="Describe how you would handle a challenging scenario, such as an unruly passenger or a stressful situation during operations."
-                  rows={4}
-                />
-              </div>
+              {questions.map((question) => (
+                <div className="space-y-2" key={question.id}>
+                  <Label htmlFor={`question-${question.id}`}>
+                    {questionLabel(question, job.title)}{question.required ? ' *' : ''}
+                  </Label>
+                  <Textarea
+                    id={`question-${question.id}`}
+                    required={question.required}
+                    value={answers[question.id] ?? ''}
+                    onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })}
+                    placeholder={question.placeholder?.replaceAll('[role]', job.title)}
+                    rows={4}
+                  />
+                </div>
+              ))}
               <div className="space-y-2">
                 <Label htmlFor="availability">When are you available to start? *</Label>
                 <Select
